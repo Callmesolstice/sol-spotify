@@ -1,0 +1,11 @@
+FROM apify/actor-python:3.11
+
+WORKDIR /usr/src/app
+
+# Install actor + SDK deps
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD ["python", "main.py"]

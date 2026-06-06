@@ -1,0 +1,20 @@
+{
+  "actorSpecification": 1,
+  "title": "Spotify→Notion Sync",
+  "description": "Run flags for the playlist sync actor. Set the 4 creds as environment variables in Actor Settings.",
+  "schemaVersion": 1,
+  "properties": {
+    "dry_run": {
+      "title": "Dry Run",
+      "type": "boolean",
+      "description": "No writes to Notion. Default true — set false to commit.",
+      "default": true
+    },
+    "update_songs": {
+      "title": "Update Existing Songs",
+      "type": "boolean",
+      "description": "Re-PATCH existing song rows. Default false.",
+      "default": false
+    }
+  }
+}

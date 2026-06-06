@@ -1,0 +1,8 @@
+{
+    "actorSpecification": 1,
+    "name": "solos-spotify-notion-sync",
+    "title": "Sol OS — Spotify→Notion Playlist Sync",
+    "description": "Daily sync of Spotify playlists (songs, metadata, junction rows) into Notion databases.",
+    "version": "0.1",
+    "dockerfile": "../Dockerfile"
+}
