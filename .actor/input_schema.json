@@ -3,6 +3,7 @@
   "title": "Spotify→Notion Sync",
   "description": "Run flags for the playlist sync actor. Set the 4 creds as environment variables in Actor Settings.",
   "schemaVersion": 1,
+  "type": "object",
   "properties": {
     "dry_run": {
       "title": "Dry Run",
