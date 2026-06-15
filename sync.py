@@ -122,6 +122,11 @@ def _prop_title(page: dict, prop: str) -> str | None:
     return vals[0]["text"]["content"] if vals else None
 
 
+def _prop_relation_id(page: dict, prop: str) -> str | None:
+    rel = page.get("properties", {}).get(prop, {}).get("relation", [])
+    return rel[0]["id"] if rel else None
+
+
 def _prefetch_indexes(
     notion_token: str,
 ) -> tuple[dict[str, str], dict[str, str], set[str]]:
@@ -154,11 +159,19 @@ def _prefetch_indexes(
         for p in playlist_pages
         if (pid := _prop_rich_text(p, "Spotify Playlist ID"))
     }
-    junction_keys: set[str] = {
-        key
-        for p in junction_pages
-        if (key := _prop_title(p, "Name"))
-    }
+    # Reconstruct each junction's logical key f"{pl_id}|{uri}" from its Song +
+    # Playlist RELATIONS, not its Name. The Name is no longer a stable dedup key
+    # (sol-enrich Phase A rewrites it to a human-readable "Track · Playlist"),
+    # so keying on Name caused sync to re-create every junction. Relations are stable.
+    uri_by_song_page = {pid: uri for uri, pid in songs_by_uri.items()}
+    plid_by_playlist_page = {pid: plid for plid, pid in playlists_by_id.items()}
+
+    junction_keys: set[str] = set()
+    for p in junction_pages:
+        uri = uri_by_song_page.get(_prop_relation_id(p, "Song"))
+        plid = plid_by_playlist_page.get(_prop_relation_id(p, "Playlist"))
+        if uri and plid:
+            junction_keys.add(f"{plid}|{uri}")
 
     return songs_by_uri, playlists_by_id, junction_keys
 
@@ -381,7 +394,9 @@ def run_sync(
             # Claim the key now — prevents double-submit within this playlist
             junction_keys.add(jkey)
             junction_tasks[jkey] = {
-                "Name": title(jkey),
+                # Human-readable Name to match sol-enrich Phase A. Dedup no longer
+                # depends on this string — it keys on the Song+Playlist relations.
+                "Name": title(f"{track.get('name', '')} · {pl_name}"),
                 "Song": relation([spid]),
                 "Playlist": relation([playlist_page_id]),
                 "Position": number(idx),
