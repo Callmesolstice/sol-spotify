@@ -1,6 +1,6 @@
 {
     "actorSpecification": 1,
-    "name": "solos-spotify-notion-sync",
+    "name": "spotify-sync",
     "title": "Sol OS — Spotify→Notion Playlist Sync",
     "description": "Daily sync of Spotify playlists (songs, metadata, junction rows) into Notion databases.",
     "version": "0.1",
